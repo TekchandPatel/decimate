@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DECIMATE — Rule-Based Decision Support System for Students</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; }
+  body { background:#0f172a; color:#e2e8f0; min-height:100vh; }
+  header { background:linear-gradient(135deg,#1e3a8a,#312e81); padding:28px 20px; text-align:center; }
+  header h1 { font-size:1.8rem; letter-spacing:1px; }
+  header p { color:#c7d2fe; margin-top:6px; font-size:.95rem; }
+  .container { max-width:820px; margin:30px auto; padding:0 16px 50px; }
+  .card { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:26px; margin-bottom:22px; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+  .card h2 { font-size:1.15rem; color:#93c5fd; margin-bottom:16px; border-bottom:1px solid #334155; padding-bottom:10px; }
+  label { display:block; margin:14px 0 6px; font-weight:600; font-size:.92rem; }
+  input[type=text], select { width:100%; padding:11px 12px; border-radius:9px; border:1px solid #475569; background:#0f172a; color:#e2e8f0; font-size:.95rem; }
+  .opts { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+  .opt { background:#0f172a; border:1px solid #334155; border-radius:9px; padding:11px 13px; cursor:pointer; transition:.15s; font-size:.92rem; }
+  .opt:hover { border-color:#6366f1; background:#1e1b4b; }
+  .opt input { margin-right:9px; accent-color:#6366f1; }
+  .btn { background:#4f46e5; color:#fff; border:none; padding:13px 30px; font-size:1rem; font-weight:600; border-radius:10px; cursor:pointer; margin-top:20px; transition:.15s; }
+  .btn:hover { background:#6366f1; transform:translateY(-2px); }
+  .btn.ghost { background:#334155; margin-left:10px; }
+  .btn.ghost:hover { background:#475569; }
+  .result-box { border-left:5px solid #4f46e5; background:#111c34; padding:18px; border-radius:10px; margin-bottom:14px; }
+  .result-box h3 { color:#a5b4fc; margin-bottom:6px; }
+  .badge { display:inline-block; background:#4f46e5; color:#fff; font-size:.75rem; padding:3px 10px; border-radius:20px; margin-bottom:8px; }
+  .reason { font-size:.85rem; color:#94a3b8; margin-top:8px; font-style:italic; }
+  .hidden { display:none; }
+  .steps { display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+  .step { background:#1e293b; border:1px solid #334155; padding:6px 14px; border-radius:20px; font-size:.8rem; color:#94a3b8; }
+  .step.on { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+  footer { text-align:center; color:#64748b; font-size:.8rem; padding:18px; }
+  .meter { height:8px; background:#0f172a; border-radius:6px; margin-top:10px; overflow:hidden; }
+  .meter div { height:100%; background:linear-gradient(90deg,#6366f1,#22d3ee); border-radius:6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 DECIMATE</h1>
+  <p>A Rule-Based Decision Support System for Students — Career Path Recommendation</p>
+</header>
+
+<div class="container">
+
+  <div class="steps">
+    <div class="step on" id="s1">1 · Profile</div>
+    <div class="step" id="s2">2 · Questions</div>
+    <div class="step" id="s3">3 · Recommendation</div>
+  </div>
+
+  <!-- STEP 1 : STUDENT PROFILE -->
+  <div class="card" id="profileCard">
+    <h2>🧑‍🎓 Step 1 — Create Your Profile</h2>
+    <label>Student Name</label>
+    <input type="text" id="name" placeholder="e.g. Rahul Sharma">
+    <label>Current Class / Year</label>
+    <select id="year">
+      <option>10th Standard</option>
+      <option>12th Standard</option>
+      <option selected>1st Year College</option>
+      <option>2nd Year College</option>
+    </select>
+    <label>Favourite Subject</label>
+    <select id="subject">
+      <option value="maths">Mathematics</option>
+      <option value="bio">Biology</option>
+      <option value="accounts">Accounts / Commerce</option>
+      <option value="art">Art / Design</option>
+      <option value="cs">Computer Science</option>
+    </select>
+    <button class="btn" onclick="startQuiz()">Start Assessment ➜</button>
+  </div>
+
+  <!-- STEP 2 : QUESTIONS -->
+  <div class="card hidden" id="quizCard">
+    <h2>📝 Step 2 — Answer 5 Simple Questions</h2>
+
+    <label>Q1. What activity do you enjoy the most?</label>
+    <div class="opts" data-q="q1">
+      <label class="opt"><input type="radio" name="q1" value="logic">Solving puzzles, maths problems & logical games</label>
+      <label class="opt"><input type="radio" name="q1" value="people">Talking to people, leading teams & organising events</label>
+      <label class="opt"><input type="radio" name="q1" value="creative">Drawing, designing, writing or making videos</label>
+      <label class="opt"><input type="radio" name="q1" value="care">Helping others, teaching or caring for people</label>
+    </div>
+
+    <label>Q2. Which work environment do you prefer?</label>
+    <div class="opts" data-q="q2">
+      <label class="opt"><input type="radio" name="q2" value="logic">Desk work with computers and data</label>
+      <label class="opt"><input type="radio" name="q2" value="people">Field work, meetings and client interaction</label>
+      <label class="opt"><input type="radio" name="q2" value="creative">Studio / flexible creative workspace</label>
+      <label class="opt"><input type="radio" name="q2" value="care">Hospitals, schools or social organisations</label>
+    </div>
+
+    <label>Q3. How do you rate your interest in technology?</label>
+    <div class="opts" data-q="q3">
+      <label class="opt"><input type="radio" name="q3" value="high">Very high — I love gadgets, apps and coding</label>
+      <label class="opt"><input type="radio" name="q3" value="mid">Moderate — I use technology when needed</label>
+      <label class="opt"><input type="radio" name="q3" value="low">Low — I prefer non-technical work</label>
+    </div>
+
+    <label>Q4. What matters most in your future career?</label>
+    <div class="opts" data-q="q4">
+      <label class="opt"><input type="radio" name="q4" value="logic">High salary & technical growth</label>
+      <label class="opt"><input type="radio" name="q4" value="people">Leadership, business & networking</label>
+      <label class="opt"><input type="radio" name="q4" value="creative">Creative freedom & self-expression</label>
+      <label class="opt"><input type="radio" name="q4" value="care">Social impact & job stability</label>
+    </div>
+
+    <label>Q5. Which statement describes you best?</label>
+    <div class="opts" data-q="q5">
+      <label class="opt"><input type="radio" name="q5" value="logic">I think analytically and love problem solving</label>
+      <label class="opt"><input type="radio" name="q5" value="people">I am persuasive and like managing people/money</label>
+      <label class="opt"><input type="radio" name="q5" value="creative">I am imaginative and think out of the box</label>
+      <label class="opt"><input type="radio" name="q5" value="care">I am patient, empathetic and service-minded</label>
+    </div>
+
+    <button class="btn" onclick="runRules()">Get My Recommendation ➜</button>
+  </div>
+
+  <!-- STEP 3 : RESULT -->
+  <div class="card hidden" id="resultCard">
+    <h2>💡 Step 3 — Your Recommendation</h2>
+    <div id="resultBody"></div>
+    <button class="btn ghost" onclick="restart()">↺ Restart</button>
+  </div>
+
+</div>
+
+<footer>DECIMATE · Micro Project · Rule-Based Decision Support System · Built with HTML, CSS & JavaScript</footer>
+
+<script>
+/* ============================================================
+   DECIMATE — Simple Rule Engine (IF–THEN rules)
+   Each rule adds a score to a career stream based on answers.
+   The stream with the highest total score is recommended.
+   ============================================================ */
+
+// Knowledge base: career streams and their descriptions
+const STREAMS = {
+  logic: {
+    title: "Engineering / Computer Science & IT",
+    badge: "Analytical + Technical",
+    desc: "Careers like Software Developer, Data Analyst, Engineer, AI/ML Engineer. Suggested courses: B.Tech CSE, BCA, B.Sc Maths/CS.",
+    tip: "Start learning a programming language (Python is great for beginners) and build small projects."
+  },
+  people: {
+    title: "Management / Commerce & Business",
+    badge: "Leadership + Communication",
+    desc: "Careers like Business Manager, Marketing Executive, Chartered Accountant, Entrepreneur. Suggested courses: BBA, B.Com, MBA later.",
+    tip: "Join clubs, take part in presentations and learn basics of accounting & economics."
+  },
+  creative: {
+    title: "Design / Arts & Creative Media",
+    badge: "Creative + Expressive",
+    desc: "Careers like Graphic Designer, UI/UX Designer, Animator, Content Creator, Journalist. Suggested courses: B.Des, BFA, Mass Communication.",
+    tip: "Build a small portfolio — free tools like Canva and Figma are perfect to start with."
+  },
+  care: {
+    title: "Medical / Teaching & Social Service",
+    badge: "Service + Stability",
+    desc: "Careers like Doctor, Nurse, Teacher, Psychologist, Social Worker. Suggested courses: MBBS/B.Sc Nursing, B.Ed, BA Psychology.",
+    tip: "Volunteer for community activities — it builds experience and looks great on applications."
+  }
+};
+
+let scores = { logic:0, people:0, creative:0, care:0 };
+let firedRules = [];
+
+function startQuiz(){
+  const name = document.getElementById('name').value.trim();
+  if(!name){ alert("Please enter your name first!"); return; }
+  document.getElementById('profileCard').classList.add('hidden');
+  document.getElementById('quizCard').classList.remove('hidden');
+  setStep(2);
+}
+
+function runRules(){
+  scores = { logic:0, people:0, creative:0, care:0 };
+  firedRules = [];
+
+  const subject = document.getElementById('subject').value;
+  const tech    = document.querySelector('input[name="q3"]:checked');
+
+  // RULE 1: favourite subject strongly indicates stream
+  if(subject==="maths" || subject==="cs") { scores.logic += 2; firedRules.push("R1: Favourite subject (Maths/CS) → +2 Analytical"); }
+  if(subject==="accounts") { scores.people += 2; firedRules.push("R1: Favourite subject (Commerce) → +2 Business"); }
+  if(subject==="bio")      { scores.care += 2;   firedRules.push("R1: Favourite subject (Biology) → +2 Medical/Service"); }
+  if(subject==="art")      { scores.creative += 2; firedRules.push("R1: Favourite subject (Art) → +2 Creative"); }
+
+  // RULES 2-5: each answer adds 1 point to its mapped stream
+  for(let q of ["q1","q2","q4","q5"]){
+    const sel = document.querySelector('input[name="'+q+'"]:checked');
+    if(!sel){ alert("Please answer all 5 questions!"); return; }
+    scores[sel.value] += 1;
+    firedRules.push("R: "+q.toUpperCase()+" answer → +1 " + STREAMS[sel.value].badge);
+  }
+
+  // RULE 6: high tech interest boosts Engineering/CS
+  if(tech.value==="high"){ scores.logic += 2; firedRules.push("R6: High tech interest → +2 Analytical"); }
+  if(tech.value==="low"){ scores.logic -= 1; firedRules.push("R6: Low tech interest → −1 Analytical"); }
+
+  // DECISION: pick the highest scoring stream
+  let best = Object.keys(scores).reduce((a,b)=> scores[a]>=scores[b] ? a : b);
+  showResult(best);
+}
+
+function showResult(key){
+  const name = document.getElementById('name').value.trim();
+  const year = document.getElementById('year').value;
+  const s = STREAMS[key];
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const pct = Math.max(10, Math.round((scores[key]/total)*100));
+
+  let html = '<p style="margin-bottom:14px;">Hello <b>'+name+'</b> ('+year+'), based on the rule engine analysis, your best-fit career path is:</p>';
+  html += '<div class="result-box"><span class="badge">'+s.badge+'</span><h3>'+s.title+'</h3><p>'+s.desc+'</p><div class="meter"><div style="width:'+pct+'%"></div></div><p class="reason">Match strength: '+pct+'%</p></div>';
+  html += '<div class="result-box" style="border-left-color:#22d3ee;"><h3>💡 Next Step Tip</h3><p>'+s.tip+'</p></div>';
+  html += '<details style="margin-top:10px;"><summary style="cursor:pointer;color:#93c5fd;">🔍 How did the system decide? (Rules fired)</summary><ul style="margin:10px 0 0 20px;font-size:.85rem;color:#94a3b8;">' + firedRules.map(r=>'<li>'+r+'</li>').join('') + '</ul></details>';
+
+  document.getElementById('resultBody').innerHTML = html;
+  document.getElementById('quizCard').classList.add('hidden');
+  document.getElementById('resultCard').classList.remove('hidden');
+  setStep(3);
+}
+
+function restart(){
+  document.getElementById('resultCard').classList.add('hidden');
+  document.getElementById('profileCard').classList.remove('hidden');
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  setStep(1);
+}
+
+function setStep(n){
+  for(let i=1;i<=3;i++) document.getElementById('s'+i).classList.toggle('on', i===n);
+}
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
